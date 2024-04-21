@@ -9,9 +9,8 @@ export const BucketServiceProvider: Provider = {
   useFactory: (environmentService: EnvironmentService) => {
     switch (environmentService.getNodeEnvironment()) {
       case 'production':
-        return new MinioService(environmentService);
       case 'development':
-        return new MockBucketService();
+        return new MinioService(environmentService);
       default:
         return new MockBucketService();
     }

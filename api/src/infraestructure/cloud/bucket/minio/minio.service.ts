@@ -15,7 +15,7 @@ export class MinioService extends BucketService {
     this.client = new Client({
       endPoint: this.environmentService.getOrThrow('MINIO_ENDPOINT'),
       port: Number(this.environmentService.get('MINIO_PORT') ?? 9000),
-      useSSL: true,
+      useSSL: environmentService.isProduction() ? true : false,
       accessKey: this.environmentService.getOrThrow('MINIO_ACCESS_KEY'),
       secretKey: this.environmentService.getOrThrow('MINIO_SECRET_KEY'),
     });
