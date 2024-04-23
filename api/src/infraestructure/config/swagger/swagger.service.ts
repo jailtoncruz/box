@@ -11,7 +11,7 @@ export class SwaggerService {
       .setTitle('Box of Everything')
       .setDescription('Keep and share your files easily.')
       .setVersion('1.0')
-      // .addBearerAuth()
+      .addBearerAuth()
       .addTag('Box', 'Group of endpoints to manage your boxes.')
       .addTag('Archive', 'Group of endpoints to manage your archives.')
       .build();

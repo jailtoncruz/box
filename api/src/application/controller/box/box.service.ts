@@ -4,7 +4,6 @@ import { PrismaService } from '../../../infraestructure/database/prisma/prisma.s
 import {
   randomBucketId,
   randomFriendlyId,
-  randomShortId,
 } from '../../../core/usecase/id-generator';
 import { CreateBoxDto } from './dto/create-box.dto';
 import { createHash } from '../../../infraestructure/config/hash/create-hash';
@@ -44,50 +43,9 @@ export class BoxService {
         description,
         password: password && (await createHash(password)),
         bucket_id: bucket,
-        root_folder: {
-          create: {
-            id: randomShortId(),
-            name: '/',
-          },
-        },
       },
     });
     delete box.password;
     return box;
   }
-
-  private async getBoxBucketId(box_id: string) {
-    const box = await this.prisma.box.findUnique({
-      where: { id: box_id },
-      select: { bucket_id: true },
-    });
-    if (!box) throw new NotFoundException();
-    return box.bucket_id;
-  }
-
-  async getPresignedGet(box_id: string, object: string) {
-    const bucket_id = await this.getBoxBucketId(box_id);
-
-    const preSigned = await this.bucket.createPresignedGetObject({
-      bucketName: bucket_id,
-      object,
-      expireAt: 60 * 60 * 8,
-    });
-
-    return { url: preSigned };
-  }
-
-  async getPresignedPut(box_id: string, object: string) {
-    const bucket_id = await this.getBoxBucketId(box_id);
-
-    const preSigned = await this.bucket.createPresignedPutObject({
-      bucketName: bucket_id,
-      object,
-      expireAt: 60 * 60 * 8,
-    });
-
-    return { url: preSigned };
-  }
-
-  async getAuthToken() {}
 }

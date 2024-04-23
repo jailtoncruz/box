@@ -15,26 +15,27 @@ datasource db {
 }
 
 model Box {
-  id             String  @id
-  name           String
-  description    String?
-  password       String?
-  bucket_id      String
-  root_folder_id String  @unique
-  root_folder    Folder  @relation(fields: [root_folder_id], references: [id])
+  id          String   @id
+  name        String
+  description String?
+  password    String?
+  bucket_id   String
+  Folder      Folder[]
 
   @@map("boxes")
 }
 
 model Folder {
-  id            String    @id
-  name          String
-  folder_id     String?
-  archives      Archive[] @relation(name: "folder_archives")
-  parent_folder Folder?   @relation(fields: [folder_id], references: [id], name: "parent_folder_relation")
-  child_folders Folder[]  @relation(name: "parent_folder_relation")
-  box           Box?
+  id               String    @id
+  name             String
+  box_id           String
+  parent_folder_id String?
+  parent_folder    Folder?   @relation(fields: [parent_folder_id], references: [id], name: "parent_folder_relation")
+  child_folders    Folder[]  @relation(name: "parent_folder_relation")
+  archives         Archive[] @relation(name: "folder_archives")
+  box              Box       @relation(fields: [box_id], references: [id])
 
+  @@unique([box_id, parent_folder_id, name])
   @@map("folders")
 }
 

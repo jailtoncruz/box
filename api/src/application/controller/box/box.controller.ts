@@ -1,12 +1,12 @@
-import { Body, Controller, Get, Param, Post, Put, Query } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Query } from '@nestjs/common';
 import { BoxService } from './box.service';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiQuery, ApiTags } from '@nestjs/swagger';
 import { CreateBoxDto } from './dto/create-box.dto';
 import { Public } from '../../../core/decorators/public';
 import { AuthenticationService } from '../../../core/abstract/authetication/authentication.service';
 import { IAuthenticationBoxPayload } from '../../../infraestructure/config/authencation/box/interfaces/box-payload';
 
-@Controller('box')
+@Controller()
 @ApiTags('Box')
 export class BoxController {
   constructor(
@@ -15,6 +15,7 @@ export class BoxController {
   ) {}
 
   @Public()
+  @ApiQuery({ name: 'password', required: false })
   @Get(':id')
   async get(@Param('id') id: string, @Query('password') password?: string) {
     const box = await this.service.getById(id, password);
@@ -27,15 +28,5 @@ export class BoxController {
   @Post()
   async create(@Body() dto: CreateBoxDto) {
     return this.service.create(dto);
-  }
-
-  @Get(':id/pre-signed')
-  getPresignedGET(@Param('id') id: string, @Query('path') path: string) {
-    return this.service.getPresignedGet(id, path);
-  }
-
-  @Put(':id/pre-signed')
-  getPresignedPUT(@Param('id') id: string, @Query('path') path: string) {
-    return this.service.getPresignedPut(id, path);
   }
 }

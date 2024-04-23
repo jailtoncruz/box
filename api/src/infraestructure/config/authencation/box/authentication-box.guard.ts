@@ -21,11 +21,13 @@ export class AuthenticationBoxGuard implements IAuthenticationGuard {
       context.getClass(),
     ]);
     if (isPublic) return true;
-    const request = context.switchToHttp().getRequest();
+    const request = context.switchToHttp().getRequest() as Request;
     const token = this.extractTokenFromHeader(request);
     if (!token) throw new UnauthorizedException();
 
     const payload = await this.authenticationService.getPayloadFromToken(token);
+    const { box_id } = request.params;
+    if (box_id !== payload.sub) return false;
     request['box'] = payload;
 
     return true;
