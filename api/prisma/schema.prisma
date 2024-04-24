@@ -40,11 +40,12 @@ model Folder {
 }
 
 model Archive {
-  id        String  @id
-  name      String
-  box_id    String
-  folder_id String?
-  folder    Folder? @relation(fields: [folder_id], references: [id], name: "folder_archives")
+  id             String  @id
+  name           String
+  box_id         String
+  folder_id      String?
+  reference_path String?
+  folder         Folder? @relation(fields: [folder_id], references: [id], name: "folder_archives")
 
   @@map("archives")
 }
