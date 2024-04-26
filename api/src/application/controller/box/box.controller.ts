@@ -19,7 +19,7 @@ export class BoxController {
   @Get(':id')
   async get(@Param('id') id: string, @Query('password') password?: string) {
     const box = await this.service.getById(id, password);
-    const payload: IAuthenticationBoxPayload = { sub: id };
+    const payload: IAuthenticationBoxPayload = { sub: id, name: box.name };
     const access_token = await this.authenticationService.getToken(payload);
     return { box, access_token };
   }
@@ -27,6 +27,9 @@ export class BoxController {
   @Public()
   @Post()
   async create(@Body() dto: CreateBoxDto) {
-    return this.service.create(dto);
+    const box = await this.service.create(dto);
+    const payload: IAuthenticationBoxPayload = { sub: box.id, name: box.name };
+    const access_token = await this.authenticationService.getToken(payload);
+    return { box, access_token };
   }
 }

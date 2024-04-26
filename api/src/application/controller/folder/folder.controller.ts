@@ -18,6 +18,11 @@ import { UpdateFolderDto } from './dto/update-folder.dto';
 export class FolderController {
   constructor(private service: FolderService) {}
 
+  @Get()
+  listFolders(@Param('box_id') id: string) {
+    return this.service.listFolders(id);
+  }
+
   @Get(':id')
   getById(@Param('id') id: string) {
     return this.service.getById(id);

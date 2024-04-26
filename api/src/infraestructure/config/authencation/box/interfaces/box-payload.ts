@@ -1,4 +1,5 @@
 import { IAuthenticationTokenPayload } from '../../../../../core/abstract/authetication/authentication.service';
 
-export interface IAuthenticationBoxPayload
-  extends IAuthenticationTokenPayload {}
+export interface IAuthenticationBoxPayload extends IAuthenticationTokenPayload {
+  name: string;
+}

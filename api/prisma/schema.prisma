@@ -20,7 +20,7 @@ model Box {
   description String?
   password    String?
   bucket_id   String
-  Folder      Folder[]
+  folders     Folder[]
 
   @@map("boxes")
 }

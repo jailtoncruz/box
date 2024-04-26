@@ -1,0 +1,35 @@
+import { CopyBoxId } from "@/components/box/copy-id";
+import { Logo } from "@/components/logo";
+import { getBoxKey } from "@/infraestructure/cookies/get-box-key";
+import { jwtDecode } from "jwt-decode";
+import { cookies } from "next/headers";
+import { redirect } from "next/navigation";
+
+export interface BoxHomeProps {
+	params: {
+		id: string;
+	};
+	children: React.ReactNode;
+}
+
+export default function BoxHomeLayout({ params, children }: BoxHomeProps) {
+	const token = cookies().get(getBoxKey(params.id));
+	if (!token) return redirect("/");
+	const data = jwtDecode<{ sub: string; name: string }>(token.value);
+
+	return (
+		<div className="flex flex-col gap-4 text-white p-8 max-w-[1000px] mx-auto flex-1">
+			<div className="flex flex-row justify-between items-center">
+				<Logo />
+				<div>
+					<h1 className="font-bold text-right text-xl">{data.name}</h1>
+					<div className="flex flex-row gap-2 justify-end items-center">
+						<p className="font-medium">{data.sub}</p>
+						<CopyBoxId id={data.sub} />
+					</div>
+				</div>
+			</div>
+			{children}
+		</div>
+	);
+}

@@ -8,6 +8,19 @@ import { UpdateFolderDto } from './dto/update-folder.dto';
 export class FolderService {
   constructor(private prisma: PrismaService) {}
 
+  async listFolders(box_id: string) {
+    const folder = await this.prisma.box.findUnique({
+      where: { id: box_id },
+      include: {
+        folders: {
+          where: { parent_folder_id: null },
+        },
+      },
+    });
+    if (!folder) throw new NotFoundException();
+    return folder;
+  }
+
   async getById(id: string) {
     const folder = await this.prisma.folder.findUnique({
       where: { id },
