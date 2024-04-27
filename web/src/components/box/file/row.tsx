@@ -1,39 +1,21 @@
 "use client";
 import { BoxContext } from "@/app/box/context";
 import { ItemDto } from "@/core/interface/item.dto";
-import { ContextMenu, Table, Text } from "@radix-ui/themes";
+import { deleteArchive } from "@/core/usecase/delete-archive";
+import {
+	AlertDialog,
+	Button,
+	ContextMenu,
+	Flex,
+	Table,
+	Text,
+} from "@radix-ui/themes";
 import { useContext } from "react";
 import { FiFile, FiFolder, FiMoreVertical } from "react-icons/fi";
 
-interface FileListProps {
-	files: ItemDto[];
-}
-
-export function FileList({ files }: FileListProps) {
-	return (
-		<Table.Root>
-			<Table.Header>
-				<Table.Row>
-					<Table.ColumnHeaderCell>Name</Table.ColumnHeaderCell>
-					<Table.ColumnHeaderCell
-						align="right"
-						width={"16px"}
-					></Table.ColumnHeaderCell>
-				</Table.Row>
-			</Table.Header>
-
-			<Table.Body>
-				{files.map((file, index) => {
-					return <FileRow {...file} key={index} />;
-				})}
-			</Table.Body>
-		</Table.Root>
-	);
-}
-
 interface FileRowProps extends ItemDto {}
 
-function FileRow({ name, type, folder, archive }: FileRowProps) {
+export function FileRow({ name, type, folder, archive }: FileRowProps) {
 	const { setCurrentFolder, setPathFolders, pathFolders } =
 		useContext(BoxContext);
 	function handleFolderNavigation() {
@@ -82,10 +64,51 @@ function FileRow({ name, type, folder, archive }: FileRowProps) {
 				<ContextMenu.Item>Share</ContextMenu.Item>
 				<ContextMenu.Item>Add to favorites</ContextMenu.Item>
 				<ContextMenu.Separator />
-				<ContextMenu.Item shortcut="⌘ ⌫" color="red">
+				<ContextMenu.Item
+					shortcut="⌘ ⌫"
+					color="red"
+					onClick={() => document.getElementById("delete-item")?.click()}
+				>
 					Delete
 				</ContextMenu.Item>
 			</ContextMenu.Content>
+			<DeleteItemDialog item={{ name, type, folder, archive }} />
 		</ContextMenu.Root>
+	);
+}
+
+function DeleteItemDialog({ item }: { item: ItemDto }) {
+	function onConfirmDelete() {
+		if (item.type === "File" && item.archive)
+			deleteArchive(item.archive.box_id, item.archive.id);
+		if (item.type === "Folder" && item.folder) console.log("delete folder");
+	}
+	return (
+		<AlertDialog.Root>
+			<AlertDialog.Trigger>
+				<div id="delete-item"> </div>
+			</AlertDialog.Trigger>
+			<AlertDialog.Content maxWidth="450px">
+				<AlertDialog.Title>
+					Delete {item.type === "Folder" ? "folder" : "archive"}
+				</AlertDialog.Title>
+				<AlertDialog.Description size="2">
+					Are you sure? This action cannot be reverted.
+				</AlertDialog.Description>
+
+				<Flex gap="3" mt="4" justify="end">
+					<AlertDialog.Cancel>
+						<Button variant="soft" color="gray">
+							Cancel
+						</Button>
+					</AlertDialog.Cancel>
+					<AlertDialog.Action>
+						<Button variant="solid" color="red" onClick={onConfirmDelete}>
+							Confirm delete
+						</Button>
+					</AlertDialog.Action>
+				</Flex>
+			</AlertDialog.Content>
+		</AlertDialog.Root>
 	);
 }

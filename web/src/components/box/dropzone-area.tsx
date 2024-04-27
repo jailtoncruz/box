@@ -4,30 +4,51 @@ import { useDropzone } from "react-dropzone";
 import { toast } from "react-toastify";
 import { upload } from "@/core/usecase/upload";
 import { BoxContext } from "@/app/box/context";
+import { AxiosProgressEvent } from "axios";
 
 interface DropzoneAreaProps {
 	boxId: string;
 }
 
 export function DropzoneArea({ boxId }: DropzoneAreaProps) {
-	const { currentFolder } = useContext(BoxContext);
+	const { currentFolder, uploadingProcesses, setUploadingProcesses } =
+		useContext(BoxContext);
 
 	const onDrop = useCallback(
 		(acceptedFiles: File[]) => {
-			const filename = acceptedFiles[0]?.name;
-			if (currentFolder)
-				upload(boxId, currentFolder.id, acceptedFiles[0])
-					.then(() => {
-						toast(`${filename} uploaded`);
+			for (const file of acceptedFiles) {
+				const filename = file.name;
+				if (currentFolder)
+					upload(boxId, currentFolder.id, file, (event: AxiosProgressEvent) => {
+						const job = uploadingProcesses.find((j) => j.name === filename);
+						if (!job && event.progress !== 1)
+							setUploadingProcesses([
+								...uploadingProcesses,
+								{ name: filename, progress: event.progress ?? 0 },
+							]);
+						else setUploadingProcesses(uploadingProcesses);
+
+						if (job) {
+							const list = uploadingProcesses.filter(
+								(d) => d.name !== job.name
+							);
+							if (event.progress !== 1)
+								list.push({ name: filename, progress: event.progress ?? 0 });
+							setUploadingProcesses(list);
+						}
 					})
-					.catch((err) => {
-						console.error(err);
-						toast(
-							`Error when trying to uploading ${filename}. Try again later.`
-						);
-					});
+						.then(() => {
+							toast(`${filename} uploaded`);
+						})
+						.catch((err) => {
+							console.error(err);
+							toast(
+								`Error when trying to uploading ${filename}. Try again later.`
+							);
+						});
+			}
 		},
-		[boxId, currentFolder]
+		[boxId, currentFolder, uploadingProcesses, setUploadingProcesses]
 	);
 
 	const { getRootProps, getInputProps, isDragActive } = useDropzone({

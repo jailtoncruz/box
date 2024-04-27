@@ -12,12 +12,14 @@ interface CreateFolderProps {}
 
 export function CreateFolder({}: CreateFolderProps) {
 	const { id } = useParams<{ id: string }>();
-	const { pathFolders, setPathFolders, currentFolder } = useContext(BoxContext);
+	const { pathFolders, setPathFolders, currentFolder, setCurrentFolder } =
+		useContext(BoxContext);
 	const [name, setName] = useState("");
 	async function handleSubmit() {
 		try {
 			const data = await createFolder(id, name, currentFolder?.id);
 			setPathFolders([...pathFolders, data]);
+			setCurrentFolder(data);
 			toast(`Folder craeted.`);
 		} catch (_err) {
 			toast(`Error when trying to creating a new folder. Try again later.`);
