@@ -4,6 +4,7 @@ import { getBoxKey } from "@/infraestructure/cookies/get-box-key";
 import { jwtDecode } from "jwt-decode";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
+import { BoxContextProvider } from "../context";
 
 export interface BoxHomeProps {
 	params: {
@@ -29,7 +30,7 @@ export default function BoxHomeLayout({ params, children }: BoxHomeProps) {
 					</div>
 				</div>
 			</div>
-			{children}
+			<BoxContextProvider>{children}</BoxContextProvider>
 		</div>
 	);
 }

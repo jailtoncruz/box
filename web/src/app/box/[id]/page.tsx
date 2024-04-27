@@ -1,14 +1,12 @@
 import { Container } from "@/components/container";
-import { Button, ContextMenu, Table } from "@radix-ui/themes";
+import { Button } from "@radix-ui/themes";
 import { listRoot } from "@/core/usecase/list-root";
-import {
-	FiFileText,
-	FiFolder,
-	FiFolderPlus,
-	FiLogOut,
-	FiMoreVertical,
-	FiPlusCircle,
-} from "react-icons/fi";
+import { FiFolderPlus, FiHome, FiPlusCircle } from "react-icons/fi";
+import { Exit } from "@/components/box/exit";
+import { Upload } from "@/components/box/upload";
+import { FileList } from "@/components/box/file-list";
+import { FolderNavigationBar } from "@/components/box/folder-navigation-bar";
+import { CreateFolder } from "@/components/box/create-folder";
 
 interface BoxHomeProps {
 	params: {
@@ -17,42 +15,22 @@ interface BoxHomeProps {
 }
 
 export default async function BoxHome({ params }: BoxHomeProps) {
-	const folders = await listRoot(params.id);
+	const box = await listRoot(params.id);
 
 	return (
-		<Container className="flex-1 p-2">
+		<Container className="flex-1 p-2 pr-4" shadowSize={4}>
 			<div className="flex flex-row items-center justify-between gap-4">
 				<div className="flex flex-row gap-2">
-					<Container
-						className="bg-gray-600 p-2 flex-row gap-2"
-						styles={{
-							boxShadow: `4px 4px 0px #9B9B9B`,
-						}}
-					>
-						<p className="text-sm">/ Folder / Sub-folder</p>
-					</Container>
-					<Container
-						className="bg-gray-600 p-2 flex-row gap-2"
-						styles={{
-							boxShadow: `4px 4px 0px #9B9B9B`,
-						}}
-					>
-						<FiFolderPlus size={20} strokeWidth={2} />
-					</Container>
+					<FolderNavigationBar />
+					<CreateFolder />
 				</div>
 				<div className="flex flex-row gap-2">
-					<Container
-						className="bg-gray-600 p-2 flex-row gap-2"
-						styles={{
-							boxShadow: `4px 4px 0px #9B9B9B`,
-						}}
-					>
-						<FiLogOut size={20} strokeWidth={2} />
-					</Container>
+					<Upload box_id={params.id} />
+					<Exit />
 				</div>
 			</div>
 			<div className="flex flex-1 mt-2 flex-col">
-				{folders.folders.length === 1 && (
+				{box.folders.length === 1 && (
 					<Button
 						color="gray"
 						variant="outline"
@@ -62,83 +40,14 @@ export default async function BoxHome({ params }: BoxHomeProps) {
 						<FiPlusCircle size={20} strokeWidth={2} />
 					</Button>
 				)}
-				<Table.Root>
-					<Table.Header>
-						<Table.Row>
-							<Table.ColumnHeaderCell>Name</Table.ColumnHeaderCell>
-							<Table.ColumnHeaderCell
-								align="right"
-								width={"16px"}
-							></Table.ColumnHeaderCell>
-						</Table.Row>
-					</Table.Header>
-
-					<Table.Body>
-						<ContextMenu.Root>
-							<ContextMenu.Trigger>
-								<Table.Row>
-									<Table.RowHeaderCell className="flex flex-row gap-2 items-center">
-										<FiFolder />
-										Folder A
-									</Table.RowHeaderCell>
-									<Table.RowHeaderCell>
-										<FiMoreVertical className="cursor-pointer" />
-									</Table.RowHeaderCell>
-								</Table.Row>
-							</ContextMenu.Trigger>
-							<ContextMenu.Content>
-								<ContextMenu.Item shortcut="⌘ E">Edit</ContextMenu.Item>
-								<ContextMenu.Item shortcut="⌘ D">Duplicate</ContextMenu.Item>
-								<ContextMenu.Separator />
-								<ContextMenu.Item shortcut="⌘ N">Archive</ContextMenu.Item>
-
-								<ContextMenu.Sub>
-									<ContextMenu.SubTrigger>More</ContextMenu.SubTrigger>
-									<ContextMenu.SubContent>
-										<ContextMenu.Item>Move to project…</ContextMenu.Item>
-										<ContextMenu.Item>Move to folder…</ContextMenu.Item>
-										<ContextMenu.Separator />
-										<ContextMenu.Item>Advanced options…</ContextMenu.Item>
-									</ContextMenu.SubContent>
-								</ContextMenu.Sub>
-
-								<ContextMenu.Separator />
-								<ContextMenu.Item>Share</ContextMenu.Item>
-								<ContextMenu.Item>Add to favorites</ContextMenu.Item>
-								<ContextMenu.Separator />
-								<ContextMenu.Item shortcut="⌘ ⌫" color="red">
-									Delete
-								</ContextMenu.Item>
-							</ContextMenu.Content>
-						</ContextMenu.Root>
-						<Table.Row>
-							<Table.RowHeaderCell className="flex flex-row gap-2 items-center">
-								<FiFolder />
-								Folder 01
-							</Table.RowHeaderCell>
-							<Table.RowHeaderCell>
-								<FiMoreVertical className="cursor-pointer" />
-							</Table.RowHeaderCell>
-						</Table.Row>
-
-						<Table.Row>
-							<Table.RowHeaderCell className="flex flex-row gap-2 items-center">
-								<FiFileText />
-								Zahra Ambessa
-							</Table.RowHeaderCell>
-							<Table.RowHeaderCell>
-								<FiMoreVertical />
-							</Table.RowHeaderCell>
-						</Table.Row>
-
-						<Table.Row>
-							<Table.RowHeaderCell>Jasper Eriksson</Table.RowHeaderCell>
-							<Table.RowHeaderCell>
-								<FiMoreVertical />
-							</Table.RowHeaderCell>
-						</Table.Row>
-					</Table.Body>
-				</Table.Root>
+				<FileList
+					files={box.folders.map((folder) => {
+						return {
+							name: folder.name,
+							type: "Folder",
+						};
+					})}
+				/>
 			</div>
 		</Container>
 	);

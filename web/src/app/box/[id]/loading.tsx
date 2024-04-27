@@ -1,3 +1,9 @@
+import { Flex, Spinner } from "@radix-ui/themes";
+
 export default function Loading() {
-	return <p>Loading...</p>;
+	return (
+		<Flex align={"center"} justify={"center"} flexGrow={"1"}>
+			<Spinner />
+		</Flex>
+	);
 }

@@ -29,8 +29,8 @@ export function EnterBox() {
 		try {
 			const { box, access_token } = await getBox(boxDto.id, boxDto.password);
 			setBoxToken(box.id, access_token.token, access_token.expireAt);
-			toast("Welcome!");
 			router.push(`/box/${box.id}`);
+			toast("Welcome!");
 		} catch (_err) {
 			toast("Box not found.");
 			setBoxDto({ id: "" });
