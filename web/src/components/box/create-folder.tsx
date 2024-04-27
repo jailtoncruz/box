@@ -3,13 +3,26 @@ import { Button, Dialog, Flex, Text, TextField } from "@radix-ui/themes";
 import { Container } from "../container";
 import { FiFolderPlus } from "react-icons/fi";
 import { useParams } from "next/navigation";
+import { createFolder } from "@/core/usecase/create-folder";
+import { useContext, useState } from "react";
+import { toast } from "react-toastify";
+import { BoxContext } from "@/app/box/context";
 
 interface CreateFolderProps {}
 
 export function CreateFolder({}: CreateFolderProps) {
 	const { id } = useParams<{ id: string }>();
-	function handleInputChange() {}
-	function handleSubmit() {}
+	const { pathFolders, setPathFolders, currentFolder } = useContext(BoxContext);
+	const [name, setName] = useState("");
+	async function handleSubmit() {
+		try {
+			const data = await createFolder(id, name, currentFolder?.id);
+			setPathFolders([...pathFolders, data]);
+			toast(`Folder craeted.`);
+		} catch (_err) {
+			toast(`Error when trying to creating a new folder. Try again later.`);
+		}
+	}
 	return (
 		<Container className="bg-gray-600 p-2 flex-row gap-2" shadowSize={4}>
 			<Dialog.Root>
@@ -35,10 +48,7 @@ export function CreateFolder({}: CreateFolderProps) {
 							</Text>
 							<TextField.Root
 								placeholder="Enter the new folder's name"
-								onChange={handleInputChange}
-								name="id"
-								// value={boxDto.id}
-								className="flex-1"
+								onChange={(event) => setName(event.target.value)}
 							/>
 						</label>
 					</Flex>

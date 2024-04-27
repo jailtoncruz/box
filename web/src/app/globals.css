@@ -6,6 +6,7 @@
 	box-sizing: border-box;
 	margin: 0;
 	padding: 0;
+	--cursor-button: pointer;
 }
 
 body {
@@ -17,8 +18,4 @@ body {
 input::-webkit-outer-spin-button,
 input::-webkit-inner-spin-button {
 	-webkit-appearance: none;
-}
-
-.radix-themes {
-	--cursor-button: pointer;
 }

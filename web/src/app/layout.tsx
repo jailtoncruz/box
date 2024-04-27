@@ -5,6 +5,7 @@ import "@radix-ui/themes/styles.css";
 import { Theme } from "@radix-ui/themes";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { BoxQueryProvider } from "@/components/query-provider";
 
 const montserrat = Montserrat({ subsets: ["latin"] });
 
@@ -20,7 +21,7 @@ export default function RootLayout({
 }>) {
 	return (
 		<html lang="en">
-			<body className={montserrat.className}>
+			<body>
 				<Theme
 					style={{
 						...montserrat.style,
@@ -29,7 +30,7 @@ export default function RootLayout({
 					}}
 					appearance="dark"
 				>
-					{children}
+					<BoxQueryProvider>{children}</BoxQueryProvider>
 					<ToastContainer theme="dark" />
 				</Theme>
 			</body>

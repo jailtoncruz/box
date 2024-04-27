@@ -1,9 +1,12 @@
-import { ContextMenu, Table } from "@radix-ui/themes";
-import Link from "next/link";
+"use client";
+import { BoxContext } from "@/app/box/context";
+import { ItemDto } from "@/core/interface/item.dto";
+import { ContextMenu, Table, Text } from "@radix-ui/themes";
+import { useContext } from "react";
 import { FiFile, FiFolder, FiMoreVertical } from "react-icons/fi";
 
 interface FileListProps {
-	files: FileRowProps[];
+	files: ItemDto[];
 }
 
 export function FileList({ files }: FileListProps) {
@@ -21,28 +24,38 @@ export function FileList({ files }: FileListProps) {
 
 			<Table.Body>
 				{files.map((file, index) => {
-					return <FileRow name={file.name} type={file.type} key={index} />;
+					return <FileRow {...file} key={index} />;
 				})}
 			</Table.Body>
 		</Table.Root>
 	);
 }
 
-interface FileRowProps {
-	name: string;
-	type: "Folder" | "File";
-}
+interface FileRowProps extends ItemDto {}
 
-function FileRow({ name, type }: FileRowProps) {
+function FileRow({ name, type, folder, archive }: FileRowProps) {
+	const { setCurrentFolder, setPathFolders, pathFolders } =
+		useContext(BoxContext);
+	function handleFolderNavigation() {
+		if (type === "Folder" && folder) {
+			setCurrentFolder(folder);
+			setPathFolders([...pathFolders, folder]);
+		} else {
+			console.log({ name, type, archive });
+		}
+	}
 	return (
 		<ContextMenu.Root>
 			<ContextMenu.Trigger>
 				<Table.Row>
 					<Table.RowHeaderCell className="flex flex-row gap-2 items-center">
 						{type === "Folder" ? <FiFolder /> : <FiFile />}
-						<Link href={""} className="hover:underline">
+						<Text
+							className="cursor-pointer hover:underline"
+							onClick={handleFolderNavigation}
+						>
 							{name}
-						</Link>
+						</Text>
 					</Table.RowHeaderCell>
 					<Table.RowHeaderCell>
 						<FiMoreVertical className="cursor-pointer" />

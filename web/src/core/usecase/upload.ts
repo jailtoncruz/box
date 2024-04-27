@@ -9,10 +9,9 @@ export async function upload(box_id: string, folder_id: string, file: File) {
 			folder_id,
 		});
 
-	const formData = new FormData();
-	formData.append("file", file);
-
-	await api.setBoxId(box_id).post<void>(archive.url, formData);
+	await api.getDefaultApi().put<void>(archive.url, file, {
+		onUploadProgress: (event) => console.log(event),
+	});
 
 	return archive;
 }

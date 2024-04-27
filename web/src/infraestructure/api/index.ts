@@ -5,6 +5,7 @@ import Cookies from "js-cookie";
 interface AxiosAuthenticatedInstance extends AxiosInstance {
 	boxId?: string;
 	setBoxId: (box_id: string) => AxiosAuthenticatedInstance;
+	getDefaultApi: () => AxiosInstance;
 }
 
 export const api = axios.create({
@@ -20,3 +21,5 @@ api.setBoxId = (box_id: string) => {
 	api.boxId = box_id;
 	return api;
 };
+
+api.getDefaultApi = () => axios;

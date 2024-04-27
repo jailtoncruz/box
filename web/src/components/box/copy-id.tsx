@@ -10,7 +10,7 @@ interface CopyBoxIdParams {
 export function CopyBoxId({ id }: CopyBoxIdParams) {
 	function handleClick() {
 		navigator.clipboard.writeText(id);
-		toast(`Copied! ✅`);
+		toast(`📦 ID copied to your clipboard`);
 	}
 	return (
 		<Button

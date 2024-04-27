@@ -5,6 +5,7 @@ import { jwtDecode } from "jwt-decode";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { BoxContextProvider } from "../context";
+import { Copyright } from "@/components/copyright";
 
 export interface BoxHomeProps {
 	params: {
@@ -31,6 +32,7 @@ export default function BoxHomeLayout({ params, children }: BoxHomeProps) {
 				</div>
 			</div>
 			<BoxContextProvider>{children}</BoxContextProvider>
+			<Copyright />
 		</div>
 	);
 }

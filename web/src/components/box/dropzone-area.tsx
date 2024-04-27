@@ -10,28 +10,30 @@ interface DropzoneAreaProps {
 }
 
 export function DropzoneArea({ boxId }: DropzoneAreaProps) {
-	const { currentFolderId } = useContext(BoxContext);
+	const { currentFolder } = useContext(BoxContext);
 
 	const onDrop = useCallback(
 		(acceptedFiles: File[]) => {
-			upload(boxId, currentFolderId, acceptedFiles[0])
-				.then(() => {
-					toast("Uploaded!");
-				})
-				.catch((err) => {
-					console.error(err);
-					toast(
-						"Ocorreu um problema ao anexar este arquivo, tente novamente em alguns minutos."
-					);
-				});
+			const filename = acceptedFiles[0]?.name;
+			if (currentFolder)
+				upload(boxId, currentFolder.id, acceptedFiles[0])
+					.then(() => {
+						toast(`${filename} uploaded`);
+					})
+					.catch((err) => {
+						console.error(err);
+						toast(
+							`Error when trying to uploading ${filename}. Try again later.`
+						);
+					});
 		},
-		[boxId, currentFolderId]
+		[boxId, currentFolder]
 	);
 
 	const { getRootProps, getInputProps, isDragActive } = useDropzone({
 		onDrop,
 		accept: {
-			"*": [],
+			// "*": [],
 		},
 	});
 
@@ -39,7 +41,7 @@ export function DropzoneArea({ boxId }: DropzoneAreaProps) {
 		<div
 			{...getRootProps()}
 			className="bg-gray-600 rounded border-dashed  text-white border-gray-200 flex items-center justify-center h-24 gap-4 border-2 
-				cursor-pointer  hover:border-green-500 transition-colors"
+				cursor-pointer  hover:border-yellow-500 transition-colors"
 		>
 			<input {...getInputProps()} />
 			{isDragActive ? (

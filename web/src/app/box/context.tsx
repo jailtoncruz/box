@@ -4,7 +4,7 @@ import { ReactNode, createContext, useState } from "react";
 
 interface BoxContextParams {
 	currentFolder?: FolderDto;
-	setCurrentFolder: (folder: FolderDto) => void;
+	setCurrentFolder: (folder?: FolderDto) => void;
 	pathFolders: FolderDto[];
 	setPathFolders: (folder: FolderDto[]) => void;
 }
@@ -21,18 +21,7 @@ interface BoxContextProviderProps {
 
 export function BoxContextProvider({ children }: BoxContextProviderProps) {
 	const [currentFolder, setCurrentFolder] = useState<FolderDto>();
-	const [pathFolders, setPathFolders] = useState<FolderDto[]>([
-		{
-			box_id: "",
-			id: "1",
-			name: "Imagens",
-		},
-		{
-			box_id: "",
-			id: "2",
-			name: "Travel",
-		},
-	]);
+	const [pathFolders, setPathFolders] = useState<FolderDto[]>([]);
 
 	return (
 		<BoxContext.Provider
