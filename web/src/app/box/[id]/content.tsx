@@ -22,7 +22,7 @@ export function BoxContentList({}: BoxContentListProps) {
 		queryFn: () => getFoldersAndArchives(box_id, currentFolder?.id),
 	});
 
-	if (isLoading || !data) return <Spinner />;
+	if (isLoading || !data) return <Spinner className="m-auto" />;
 
 	return (
 		<Container className="flex-1 p-2 pr-4" shadowSize={4}>
