@@ -5,14 +5,21 @@ import { toast } from "react-toastify";
 import { upload } from "@/core/usecase/upload";
 import { BoxContext } from "@/app/box/context";
 import { AxiosProgressEvent } from "axios";
+import { debounce } from "@/core/usecase/debounce";
 
 interface DropzoneAreaProps {
 	boxId: string;
 }
 
 export function DropzoneArea({ boxId }: DropzoneAreaProps) {
-	const { currentFolder, uploadingProcesses, setUploadingProcesses } =
-		useContext(BoxContext);
+	const {
+		currentFolder,
+		uploadingProcesses,
+		setUploadingProcesses,
+		setUpdatedAt,
+	} = useContext(BoxContext);
+
+	const delayedFunction = debounce(() => setUpdatedAt(new Date()), 250); // 250ms
 
 	const onDrop = useCallback(
 		(acceptedFiles: File[]) => {
@@ -38,6 +45,7 @@ export function DropzoneArea({ boxId }: DropzoneAreaProps) {
 						}
 					})
 						.then(() => {
+							delayedFunction();
 							toast(`${filename} uploaded`);
 						})
 						.catch((err) => {
@@ -48,14 +56,18 @@ export function DropzoneArea({ boxId }: DropzoneAreaProps) {
 						});
 			}
 		},
-		[boxId, currentFolder, uploadingProcesses, setUploadingProcesses]
+		[
+			boxId,
+			currentFolder,
+			uploadingProcesses,
+			setUploadingProcesses,
+			delayedFunction,
+		]
 	);
 
 	const { getRootProps, getInputProps, isDragActive } = useDropzone({
 		onDrop,
-		accept: {
-			// "*": [],
-		},
+		accept: {},
 	});
 
 	return (

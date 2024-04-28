@@ -2,6 +2,7 @@
 import { BoxContext } from "@/app/box/context";
 import { ItemDto } from "@/core/interface/item.dto";
 import { deleteArchive } from "@/core/usecase/delete-archive";
+import { deleteFolder } from "@/core/usecase/delete-folder";
 import {
 	AlertDialog,
 	Button,
@@ -10,6 +11,7 @@ import {
 	Table,
 	Text,
 } from "@radix-ui/themes";
+import { useParams } from "next/navigation";
 import { useContext } from "react";
 import { FiFile, FiFolder, FiMoreVertical } from "react-icons/fi";
 
@@ -23,7 +25,7 @@ export function FileRow({ name, type, folder, archive }: FileRowProps) {
 			setCurrentFolder(folder);
 			setPathFolders([...pathFolders, folder]);
 		} else {
-			console.log({ name, type, archive });
+			console.log("Preview", { name, type, archive });
 		}
 	}
 	return (
@@ -38,6 +40,7 @@ export function FileRow({ name, type, folder, archive }: FileRowProps) {
 						>
 							{name}
 						</Text>
+						<DeleteItemDialog item={{ name, type, folder, archive }} />
 					</Table.RowHeaderCell>
 					<Table.RowHeaderCell>
 						<FiMoreVertical className="cursor-pointer" />
@@ -72,16 +75,20 @@ export function FileRow({ name, type, folder, archive }: FileRowProps) {
 					Delete
 				</ContextMenu.Item>
 			</ContextMenu.Content>
-			<DeleteItemDialog item={{ name, type, folder, archive }} />
 		</ContextMenu.Root>
 	);
 }
 
 function DeleteItemDialog({ item }: { item: ItemDto }) {
-	function onConfirmDelete() {
+	const { id: box_id } = useParams<{ id: string }>();
+	const { setUpdatedAt } = useContext(BoxContext);
+	async function onConfirmDelete() {
 		if (item.type === "File" && item.archive)
-			deleteArchive(item.archive.box_id, item.archive.id);
-		if (item.type === "Folder" && item.folder) console.log("delete folder");
+			await deleteArchive(box_id, item.archive.id);
+		if (item.type === "Folder" && item.folder)
+			await deleteFolder(box_id, item.folder.id);
+
+		setUpdatedAt(new Date());
 	}
 	return (
 		<AlertDialog.Root>
@@ -104,7 +111,7 @@ function DeleteItemDialog({ item }: { item: ItemDto }) {
 					</AlertDialog.Cancel>
 					<AlertDialog.Action>
 						<Button variant="solid" color="red" onClick={onConfirmDelete}>
-							Confirm delete
+							Confirm
 						</Button>
 					</AlertDialog.Action>
 				</Flex>

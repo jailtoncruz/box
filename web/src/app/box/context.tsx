@@ -1,15 +1,23 @@
 "use client";
 import { FolderDto } from "@/core/interface/folder.dto";
 import { UploadingProcess } from "@/core/interface/uploading-process";
-import { ReactNode, createContext, useState } from "react";
+import {
+	Dispatch,
+	ReactNode,
+	SetStateAction,
+	createContext,
+	useState,
+} from "react";
 
 interface BoxContextParams {
 	currentFolder?: FolderDto;
-	setCurrentFolder: (folder?: FolderDto) => void;
+	setCurrentFolder: Dispatch<SetStateAction<FolderDto | undefined>>;
 	pathFolders: FolderDto[];
 	setPathFolders: (folder: FolderDto[]) => void;
 	uploadingProcesses: UploadingProcess[];
 	setUploadingProcesses: (processes: UploadingProcess[]) => void;
+	updatedAt: Date;
+	setUpdatedAt: Dispatch<SetStateAction<Date>>;
 }
 
 export const BoxContext = createContext<BoxContextParams>({
@@ -18,6 +26,8 @@ export const BoxContext = createContext<BoxContextParams>({
 	setPathFolders: () => {},
 	setCurrentFolder: () => {},
 	setUploadingProcesses: () => {},
+	updatedAt: new Date(),
+	setUpdatedAt: () => {},
 });
 
 interface BoxContextProviderProps {
@@ -30,6 +40,7 @@ export function BoxContextProvider({ children }: BoxContextProviderProps) {
 	const [uploadingProcesses, setUploadingProcesses] = useState<
 		UploadingProcess[]
 	>([]);
+	const [updatedAt, setUpdatedAt] = useState<Date>(new Date());
 
 	return (
 		<BoxContext.Provider
@@ -40,6 +51,8 @@ export function BoxContextProvider({ children }: BoxContextProviderProps) {
 				setPathFolders,
 				uploadingProcesses,
 				setUploadingProcesses,
+				updatedAt,
+				setUpdatedAt,
 			}}
 		>
 			{children}

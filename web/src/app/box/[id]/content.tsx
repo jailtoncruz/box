@@ -5,7 +5,7 @@ import { FileList } from "@/components/box/file/list";
 import { FolderNavigationBar } from "@/components/box/folder-navigation-bar";
 import { Upload } from "@/components/box/upload";
 import { Container } from "@/components/container";
-import { Flex, Progress, ScrollArea, Spinner, Text } from "@radix-ui/themes";
+import { ScrollArea, Spinner, Text } from "@radix-ui/themes";
 import { useQuery } from "@tanstack/react-query";
 import { useContext } from "react";
 import { BoxContext } from "../context";
@@ -17,9 +17,11 @@ interface BoxContentListProps {}
 
 export function BoxContentList({}: BoxContentListProps) {
 	const { id: box_id } = useParams<{ id: string }>();
-	const { currentFolder, uploadingProcesses } = useContext(BoxContext);
+	const { currentFolder, uploadingProcesses, updatedAt } =
+		useContext(BoxContext);
+
 	const { isLoading, data } = useQuery({
-		queryKey: ["folder-archives", box_id, currentFolder?.id],
+		queryKey: ["folder-archives", box_id, currentFolder?.id, updatedAt],
 		queryFn: () => getFoldersAndArchives(box_id, currentFolder?.id),
 	});
 
