@@ -2,7 +2,7 @@
 import { Button, Dialog, Flex, Text, TextField } from "@radix-ui/themes";
 import Image from "next/image";
 import logo from "../../../public/logo/Box-Icon_4x.png";
-import { ChangeEvent, MouseEvent, useState } from "react";
+import { ChangeEvent, KeyboardEvent, MouseEvent, useState } from "react";
 import { BoxDto } from "@/core/interface/box.dto";
 import { createBox } from "@/core/usecase/create-box";
 import { useRouter } from "next/navigation";
@@ -21,10 +21,18 @@ export function NewBox() {
 		event: MouseEvent<HTMLButtonElement, globalThis.MouseEvent>
 	) {
 		event.preventDefault();
-		const { box, access_token } = await createBox(boxDto);
-		setBoxToken(box.id, access_token.token, access_token.expireAt);
-		router.push(`/box/${box.id}`);
-		toast("Welcome!");
+		try {
+			const { box, access_token } = await createBox(boxDto);
+			setBoxToken(box.id, access_token.token, access_token.expireAt);
+			router.push(`/box/${box.id}`);
+			toast("Welcome!");
+		} catch (_err) {
+			toast("This box could not be created 😥. Try again in a few minutes.");
+		}
+	}
+
+	function onEnter(event: KeyboardEvent<HTMLInputElement>) {
+		if (event.key === "Enter") handleSubmit(event as any);
 	}
 
 	return (
@@ -57,6 +65,7 @@ export function NewBox() {
 							onChange={handleInputChange}
 							name="name"
 							value={boxDto.name}
+							onKeyDown={onEnter}
 						/>
 					</label>
 					<label>

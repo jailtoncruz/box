@@ -2,7 +2,7 @@
 import Image from "next/image";
 import logIn from "../../../public/icons/log-in.svg";
 import { Button, Dialog, Flex, Text, TextField } from "@radix-ui/themes";
-import { ChangeEvent, MouseEvent, useState } from "react";
+import { ChangeEvent, KeyboardEvent, MouseEvent, useState } from "react";
 import { useRouter } from "next/navigation";
 import { getBox } from "@/core/usecase/get-box";
 import { toast } from "react-toastify";
@@ -33,8 +33,12 @@ export function EnterBox() {
 			toast("Welcome!");
 		} catch (_err) {
 			toast("Box not found.");
-			setBoxDto({ id: "" });
+			setBoxDto({ id: "", password: "" });
 		}
+	}
+
+	function onEnter(event: KeyboardEvent<HTMLInputElement>) {
+		if (event.key === "Enter") handleSubmit(event as any);
 	}
 
 	return (
@@ -69,6 +73,7 @@ export function EnterBox() {
 								name="id"
 								value={boxDto.id}
 								className="flex-1"
+								onKeyDown={onEnter}
 							/>
 							<Button
 								variant="outline"
@@ -96,6 +101,7 @@ export function EnterBox() {
 							onChange={handleInputChange}
 							name="password"
 							value={boxDto.password}
+							onKeyDown={onEnter}
 						/>
 					</label>
 				</Flex>

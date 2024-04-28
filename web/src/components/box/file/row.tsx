@@ -1,33 +1,47 @@
 "use client";
 import { BoxContext } from "@/app/box/context";
 import { ItemDto } from "@/core/interface/item.dto";
-import { deleteArchive } from "@/core/usecase/delete-archive";
-import { deleteFolder } from "@/core/usecase/delete-folder";
-import {
-	AlertDialog,
-	Button,
-	ContextMenu,
-	Flex,
-	Table,
-	Text,
-} from "@radix-ui/themes";
-import { useParams } from "next/navigation";
+import { ContextMenu, Table, Text } from "@radix-ui/themes";
 import { useContext } from "react";
 import { FiFile, FiFolder, FiMoreVertical } from "react-icons/fi";
+import { DeleteItemDialog } from "./dialog/delete-item-dialog";
+import { getArchive } from "@/core/usecase/get-archive";
+import { PreviewDialog } from "./dialog/preview-dialog";
+import { toast } from "react-toastify";
 
 interface FileRowProps extends ItemDto {}
 
 export function FileRow({ name, type, folder, archive }: FileRowProps) {
 	const { setCurrentFolder, setPathFolders, pathFolders } =
 		useContext(BoxContext);
+	const item = { name, type, folder, archive };
 	function handleFolderNavigation() {
 		if (type === "Folder" && folder) {
 			setCurrentFolder(folder);
 			setPathFolders([...pathFolders, folder]);
-		} else {
-			console.log("Preview", { name, type, archive });
+		} else if (archive) {
+			PreviewDialog.open(archive.id);
 		}
 	}
+
+	async function handleDownloadItem() {
+		if (archive) {
+			const { url } = await getArchive(archive.box_id, archive.id);
+			const a = document.createElement("a");
+			a.download = archive.name;
+			a.href = url;
+			a.click();
+		}
+	}
+
+	async function handleCopyLink() {
+		if (archive) {
+			const { url } = await getArchive(archive.box_id, archive.id);
+			navigator.clipboard.writeText(url);
+			toast(`Link copied`);
+		}
+	}
+
 	return (
 		<ContextMenu.Root>
 			<ContextMenu.Trigger>
@@ -40,7 +54,8 @@ export function FileRow({ name, type, folder, archive }: FileRowProps) {
 						>
 							{name}
 						</Text>
-						<DeleteItemDialog item={{ name, type, folder, archive }} />
+						<DeleteItemDialog item={item} />
+						{item.archive && <PreviewDialog archive={item.archive} />}
 					</Table.RowHeaderCell>
 					<Table.RowHeaderCell>
 						<FiMoreVertical className="cursor-pointer" />
@@ -48,8 +63,14 @@ export function FileRow({ name, type, folder, archive }: FileRowProps) {
 				</Table.Row>
 			</ContextMenu.Trigger>
 			<ContextMenu.Content>
-				<ContextMenu.Item shortcut="⌘ E">Edit</ContextMenu.Item>
-				<ContextMenu.Item shortcut="⌘ D">Duplicate</ContextMenu.Item>
+				<ContextMenu.Item
+					shortcut="⬇️"
+					onClick={handleDownloadItem}
+					disabled={type === "Folder"}
+				>
+					Download
+				</ContextMenu.Item>
+				{/* <ContextMenu.Item shortcut="⌘ D">Duplicate</ContextMenu.Item>
 				<ContextMenu.Separator />
 				<ContextMenu.Item shortcut="⌘ N">Archive</ContextMenu.Item>
 
@@ -63,59 +84,20 @@ export function FileRow({ name, type, folder, archive }: FileRowProps) {
 					</ContextMenu.SubContent>
 				</ContextMenu.Sub>
 
-				<ContextMenu.Separator />
-				<ContextMenu.Item>Share</ContextMenu.Item>
-				<ContextMenu.Item>Add to favorites</ContextMenu.Item>
+				<ContextMenu.Separator /> */}
+				<ContextMenu.Item onClick={handleCopyLink} shortcut="🔗">
+					Copy link
+				</ContextMenu.Item>
+				{/* <ContextMenu.Item>Add to favorites</ContextMenu.Item> */}
 				<ContextMenu.Separator />
 				<ContextMenu.Item
-					shortcut="⌘ ⌫"
+					shortcut="🗑️"
 					color="red"
-					onClick={() => document.getElementById("delete-item")?.click()}
+					onClick={DeleteItemDialog.open}
 				>
 					Delete
 				</ContextMenu.Item>
 			</ContextMenu.Content>
 		</ContextMenu.Root>
-	);
-}
-
-function DeleteItemDialog({ item }: { item: ItemDto }) {
-	const { id: box_id } = useParams<{ id: string }>();
-	const { setUpdatedAt } = useContext(BoxContext);
-	async function onConfirmDelete() {
-		if (item.type === "File" && item.archive)
-			await deleteArchive(box_id, item.archive.id);
-		if (item.type === "Folder" && item.folder)
-			await deleteFolder(box_id, item.folder.id);
-
-		setUpdatedAt(new Date());
-	}
-	return (
-		<AlertDialog.Root>
-			<AlertDialog.Trigger>
-				<div id="delete-item"> </div>
-			</AlertDialog.Trigger>
-			<AlertDialog.Content maxWidth="450px">
-				<AlertDialog.Title>
-					Delete {item.type === "Folder" ? "folder" : "archive"}
-				</AlertDialog.Title>
-				<AlertDialog.Description size="2">
-					Are you sure? This action cannot be reverted.
-				</AlertDialog.Description>
-
-				<Flex gap="3" mt="4" justify="end">
-					<AlertDialog.Cancel>
-						<Button variant="soft" color="gray">
-							Cancel
-						</Button>
-					</AlertDialog.Cancel>
-					<AlertDialog.Action>
-						<Button variant="solid" color="red" onClick={onConfirmDelete}>
-							Confirm
-						</Button>
-					</AlertDialog.Action>
-				</Flex>
-			</AlertDialog.Content>
-		</AlertDialog.Root>
 	);
 }

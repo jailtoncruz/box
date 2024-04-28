@@ -45,6 +45,7 @@ model Archive {
   box_id         String
   folder_id      String?
   reference_path String?
+  type           String?
   folder         Folder? @relation(fields: [folder_id], references: [id], name: "folder_archives")
 
   @@map("archives")

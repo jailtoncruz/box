@@ -4,5 +4,6 @@ export interface ArchiveDto {
 	box_id: string;
 	folder_id: string;
 	reference_path: string;
+	type?: string;
 	url: string;
 }

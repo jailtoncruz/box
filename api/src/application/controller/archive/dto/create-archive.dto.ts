@@ -9,4 +9,7 @@ export class CreateArchiveDto {
   @ApiProperty()
   @IsNotEmpty()
   folder_id: string;
+
+  @ApiProperty({ required: false })
+  type?: string;
 }

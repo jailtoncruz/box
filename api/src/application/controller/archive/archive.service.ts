@@ -36,7 +36,7 @@ export class ArchiveService {
     return { ...archive, url };
   }
 
-  async create(box_id: string, { name, folder_id }: CreateArchiveDto) {
+  async create(box_id: string, { name, folder_id, type }: CreateArchiveDto) {
     const reference_path = await this.getReferencePathUsecase.execute(
       folder_id,
       name,
@@ -48,6 +48,7 @@ export class ArchiveService {
         name,
         folder_id,
         reference_path,
+        type,
       },
     });
 

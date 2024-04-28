@@ -6,6 +6,7 @@ interface AxiosAuthenticatedInstance extends AxiosInstance {
 	boxId?: string;
 	setBoxId: (box_id: string) => AxiosAuthenticatedInstance;
 	getDefaultApi: () => AxiosInstance;
+	clearInterceptors: () => void;
 }
 
 export const api = axios.create({
@@ -23,3 +24,4 @@ api.setBoxId = (box_id: string) => {
 };
 
 api.getDefaultApi = () => axios;
+api.clearInterceptors = () => api.interceptors.request.clear();

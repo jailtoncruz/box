@@ -13,6 +13,7 @@ export async function upload(
 		.post<ArchiveDto>(`/box/${box_id}/archive`, {
 			name: file.name,
 			folder_id,
+			type: file.type,
 		});
 
 	await api.getDefaultApi().put<void>(archive.url, file, {
