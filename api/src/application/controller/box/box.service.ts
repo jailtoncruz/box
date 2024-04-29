@@ -55,7 +55,10 @@ export class BoxService {
       delete box.password;
       return box;
     } catch (_err) {
-      this.logger.error(_err);
+      const err = _err as Error;
+      this.logger.error(err.message);
+      this.logger.error(err.stack);
+      console.error(err);
       throw new BadRequestException();
     }
   }
