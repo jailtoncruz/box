@@ -13,7 +13,9 @@ async function bootstrap() {
   app.useGlobalPipes(new ValidationPipe());
   app.get(SwaggerService).init(app);
   app.enableCors({
-    origin: environmentService.isProduction() ? 'https://*.tomcruz.dev' : '*',
+    origin: environmentService.isProduction()
+      ? environmentService.getOrThrow('PRODUCTION_ORIGIN')
+      : '*',
   });
   await app.listen(environmentService.getServerPort());
 }
