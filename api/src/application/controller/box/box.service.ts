@@ -1,4 +1,9 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  Logger,
+  NotFoundException,
+} from '@nestjs/common';
 import { BucketService } from '../../../core/abstract/cloud/bucket-service';
 import { PrismaService } from '../../../infraestructure/database/prisma/prisma.service';
 import {
@@ -14,6 +19,7 @@ export class BoxService {
   constructor(
     private prisma: PrismaService,
     private bucket: BucketService,
+    private logger: Logger = new Logger(BoxService.name),
   ) {}
 
   async getById(id: string, password?: string) {
@@ -34,18 +40,23 @@ export class BoxService {
   }
 
   async create({ name, description, password }: CreateBoxDto) {
-    const bucket_id = randomBucketId();
-    const bucket = await this.bucket.createBucket(bucket_id);
-    const box = await this.prisma.box.create({
-      data: {
-        id: randomFriendlyId(),
-        name,
-        description,
-        password: password && (await createHash(password)),
-        bucket_id: bucket,
-      },
-    });
-    delete box.password;
-    return box;
+    try {
+      const bucket_id = randomBucketId();
+      const bucket = await this.bucket.createBucket(bucket_id);
+      const box = await this.prisma.box.create({
+        data: {
+          id: randomFriendlyId(),
+          name,
+          description,
+          password: password && (await createHash(password)),
+          bucket_id: bucket,
+        },
+      });
+      delete box.password;
+      return box;
+    } catch (_err) {
+      this.logger.error(_err);
+      throw new BadRequestException();
+    }
   }
 }
