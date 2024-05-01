@@ -24,9 +24,11 @@ export default function BoxHomeLayout({ params, children }: BoxHomeProps) {
 			<div className="flex flex-row justify-between items-center">
 				<Logo />
 				<div>
-					<h1 className="font-bold text-right text-xl">{data.name}</h1>
+					<h1 className="font-bold text-right text-base md:text-xl">
+						{data.name}
+					</h1>
 					<div className="flex flex-row gap-2 justify-end items-center">
-						<p className="font-medium">{data.sub}</p>
+						<p className="font-medium text-sm md:text-base">{data.sub}</p>
 						<CopyBoxId id={data.sub} />
 					</div>
 				</div>

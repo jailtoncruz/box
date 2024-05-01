@@ -33,13 +33,17 @@ export function NewBox() {
 		<Dialog.Root>
 			<Dialog.Trigger>
 				<div
-					className="bg-gray-800 rounded px-8 py-4 flex flex-col gap-4 text-white border-dashed border-gray-400 border-4 aspect-square items-center"
+					className="bg-gray-800 rounded px-8 py-4 flex flex-col gap-2 md:gap-4 text-white border-dashed border-gray-400 border-4 items-center justify-center flex-1"
 					style={{
 						boxShadow: `8px 8px 0px #DADADA`,
 						cursor: "pointer",
 					}}
 				>
-					<Image src={logo} alt="" className="w-auto aspect-auto max-h-44" />
+					<Image
+						src={logo}
+						alt=""
+						className="h-16 md:h-32 w-auto aspect-auto"
+					/>
 					<h1 className="text-center font-bold text-2xl">New Box</h1>
 				</div>
 			</Dialog.Trigger>

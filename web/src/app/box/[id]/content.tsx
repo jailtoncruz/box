@@ -38,7 +38,9 @@ export function BoxContentList() {
 			</div>
 			<div className="flex flex-1 mt-2 flex-col ">
 				{data.length === 0 ? (
-					<Text className="text-center my-auto">Folder empty</Text>
+					<Text className="text-center my-auto text-xs md:text-base">
+						Nothing here ...
+					</Text>
 				) : (
 					<ScrollArea
 						type="auto"
