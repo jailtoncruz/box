@@ -5,47 +5,46 @@ import { toast } from "react-toastify";
 import { upload } from "@/core/usecase/upload";
 import { BoxContext } from "@/app/box/context";
 import { AxiosProgressEvent } from "axios";
-import { debounce } from "@/core/usecase/debounce";
+import { useQueryClient } from "@tanstack/react-query";
 
 interface DropzoneAreaProps {
 	boxId: string;
 }
 
 export function DropzoneArea({ boxId }: DropzoneAreaProps) {
-	const {
-		currentFolder,
-		uploadingProcesses,
-		setUploadingProcesses,
-		setUpdatedAt,
-	} = useContext(BoxContext);
+	const { currentFolder, uploadingProcesses, setUploadingProcesses } =
+		useContext(BoxContext);
+	const queryClient = useQueryClient();
+	const onUploadProgress = useCallback(
+		(event: AxiosProgressEvent, filename: string) => {
+			const job = uploadingProcesses.find((j) => j.name === filename);
+			if (!job && event.progress !== 1)
+				setUploadingProcesses([
+					...uploadingProcesses,
+					{ name: filename, progress: event.progress ?? 0 },
+				]);
+			else setUploadingProcesses(uploadingProcesses);
 
-	const delayedFunction = debounce(() => setUpdatedAt(new Date()), 250); // 250ms
+			if (job) {
+				const list = uploadingProcesses.filter((d) => d.name !== job.name);
+				if (event.progress !== 1)
+					list.push({ name: filename, progress: event.progress ?? 0 });
+				setUploadingProcesses(list);
+			}
+		},
+		[setUploadingProcesses, uploadingProcesses]
+	);
 
 	const onDrop = useCallback(
 		(acceptedFiles: File[]) => {
 			for (const file of acceptedFiles) {
 				const filename = file.name;
 				if (currentFolder)
-					upload(boxId, currentFolder.id, file, (event: AxiosProgressEvent) => {
-						const job = uploadingProcesses.find((j) => j.name === filename);
-						if (!job && event.progress !== 1)
-							setUploadingProcesses([
-								...uploadingProcesses,
-								{ name: filename, progress: event.progress ?? 0 },
-							]);
-						else setUploadingProcesses(uploadingProcesses);
-
-						if (job) {
-							const list = uploadingProcesses.filter(
-								(d) => d.name !== job.name
-							);
-							if (event.progress !== 1)
-								list.push({ name: filename, progress: event.progress ?? 0 });
-							setUploadingProcesses(list);
-						}
-					})
+					upload(boxId, currentFolder.id, file, (event: AxiosProgressEvent) =>
+						onUploadProgress(event, filename)
+					)
 						.then(() => {
-							delayedFunction();
+							queryClient.invalidateQueries({ queryKey: ["folder-archives"] });
 							toast(`${filename} uploaded`);
 						})
 						.catch((err) => {
@@ -56,13 +55,7 @@ export function DropzoneArea({ boxId }: DropzoneAreaProps) {
 						});
 			}
 		},
-		[
-			boxId,
-			currentFolder,
-			uploadingProcesses,
-			setUploadingProcesses,
-			delayedFunction,
-		]
+		[boxId, currentFolder, queryClient, onUploadProgress]
 	);
 
 	const { getRootProps, getInputProps, isDragActive } = useDropzone({

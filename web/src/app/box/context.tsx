@@ -16,8 +16,6 @@ interface BoxContextParams {
 	setPathFolders: (folder: FolderDto[]) => void;
 	uploadingProcesses: UploadingProcess[];
 	setUploadingProcesses: (processes: UploadingProcess[]) => void;
-	updatedAt: Date;
-	setUpdatedAt: Dispatch<SetStateAction<Date>>;
 }
 
 export const BoxContext = createContext<BoxContextParams>({
@@ -26,8 +24,6 @@ export const BoxContext = createContext<BoxContextParams>({
 	setPathFolders: () => {},
 	setCurrentFolder: () => {},
 	setUploadingProcesses: () => {},
-	updatedAt: new Date(),
-	setUpdatedAt: () => {},
 });
 
 interface BoxContextProviderProps {
@@ -40,7 +36,6 @@ export function BoxContextProvider({ children }: BoxContextProviderProps) {
 	const [uploadingProcesses, setUploadingProcesses] = useState<
 		UploadingProcess[]
 	>([]);
-	const [updatedAt, setUpdatedAt] = useState<Date>(new Date());
 
 	return (
 		<BoxContext.Provider
@@ -51,8 +46,6 @@ export function BoxContextProvider({ children }: BoxContextProviderProps) {
 				setPathFolders,
 				uploadingProcesses,
 				setUploadingProcesses,
-				updatedAt,
-				setUpdatedAt,
 			}}
 		>
 			{children}

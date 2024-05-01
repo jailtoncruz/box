@@ -13,15 +13,12 @@ import { getFoldersAndArchives } from "@/core/usecase/get-folders-and-archives";
 import { useParams } from "next/navigation";
 import { UploadStatusBar } from "@/components/box/upload-status-bar";
 
-interface BoxContentListProps {}
-
-export function BoxContentList({}: BoxContentListProps) {
+export function BoxContentList() {
 	const { id: box_id } = useParams<{ id: string }>();
-	const { currentFolder, uploadingProcesses, updatedAt } =
-		useContext(BoxContext);
+	const { currentFolder, uploadingProcesses } = useContext(BoxContext);
 
 	const { isLoading, data } = useQuery({
-		queryKey: ["folder-archives", box_id, currentFolder?.id, updatedAt],
+		queryKey: ["folder-archives", box_id, currentFolder?.id],
 		queryFn: () => getFoldersAndArchives(box_id, currentFolder?.id),
 	});
 

@@ -1,4 +1,4 @@
-import { Inject, Injectable, NotFoundException } from '@nestjs/common';
+import { Inject, Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../../../infraestructure/database/prisma/prisma.service';
 import { BucketService } from '../../../core/abstract/cloud/bucket-service';
 import { randomShortId } from '../../../core/usecase/id-generator';
@@ -18,6 +18,7 @@ export class ArchiveService {
     private environmentService: EnvironmentService,
     @Inject(CACHE_MANAGER) private cacheManager: Cache,
     private getReferencePathUsecase: GetReferencePathUsecase,
+    private logger: Logger = new Logger(ArchiveService.name),
   ) {
     this.expireAccessInSeconds = Number(
       this.environmentService.get('ACCESS_EXPIRE_IN_SECONDS') ?? 60 * 60 * 8,
@@ -64,7 +65,7 @@ export class ArchiveService {
       });
       await this.bucketService.deleteObject(archive.reference_path);
     } catch (_err) {
-      console.error(_err);
+      this.logger.error(_err);
       throw new NotFoundException();
     }
   }

@@ -1,4 +1,4 @@
-import { BadGatewayException, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import {
   BucketService,
   CreatePreSignedOptions,
@@ -40,43 +40,38 @@ export class CloudFlareR2Service extends BucketService {
     return stream.Contents;
   }
   async deleteObject(object: string): Promise<void> {
-    await this.client.deleteObject({
-      Bucket: this.bucketName,
-      Key: object,
-    });
+    try {
+      await this.client.deleteObject({
+        Bucket: this.bucketName,
+        Key: object,
+      });
+    } catch (_err) {}
   }
   async createPresignedGetObject({
     object,
     expireAt,
   }: CreatePreSignedOptions): Promise<string> {
-    try {
-      const command = new GetObjectCommand({
-        Bucket: this.bucketName,
-        Key: object,
-      });
-      const url = await getSignedUrl(this.client, command, {
-        expiresIn: expireAt,
-      });
-      return url;
-    } catch (_err) {
-      console.error(_err);
-      throw new BadGatewayException();
-    }
+    const command = new GetObjectCommand({
+      Bucket: this.bucketName,
+      Key: object,
+    });
+    const url = await getSignedUrl(this.client, command, {
+      expiresIn: expireAt,
+    });
+    return url;
   }
 
   async createPresignedPutObject({
     object,
+    expireAt,
   }: CreatePreSignedOptions): Promise<string> {
-    try {
-      const command = new PutObjectCommand({
-        Bucket: this.bucketName,
-        Key: object,
-      });
-      const url = await getSignedUrl(this.client, command, { expiresIn: 3600 });
-      return url;
-    } catch (_err) {
-      console.error(_err);
-      throw new BadGatewayException();
-    }
+    const command = new PutObjectCommand({
+      Bucket: this.bucketName,
+      Key: object,
+    });
+    const url = await getSignedUrl(this.client, command, {
+      expiresIn: expireAt,
+    });
+    return url;
   }
 }

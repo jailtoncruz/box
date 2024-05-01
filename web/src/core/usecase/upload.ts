@@ -1,6 +1,7 @@
 import { api } from "@/infraestructure/api";
 import { ArchiveDto } from "../interface/archive.dto";
 import { AxiosProgressEvent } from "axios";
+import { deleteArchive } from "./delete-archive";
 
 export async function upload(
 	box_id: string,
@@ -16,9 +17,15 @@ export async function upload(
 			type: file.type,
 		});
 
-	await api.getDefaultApi().put<void>(archive.url, file, {
-		onUploadProgress,
-	});
+	try {
+		await api.getDefaultApi().put<void>(archive.url, file, {
+			onUploadProgress,
+		});
+	} catch (_err) {
+		const err = _err as Error;
+		await deleteArchive(box_id, archive.id);
+		throw new Error(err.message);
+	}
 
 	return archive;
 }

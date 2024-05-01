@@ -1,23 +1,22 @@
-import { BoxContext } from "@/app/box/context";
 import { ItemDto } from "@/core/interface/item.dto";
 import { deleteArchive } from "@/core/usecase/delete-archive";
 import { deleteFolder } from "@/core/usecase/delete-folder";
 import { AlertDialog, Button, Flex } from "@radix-ui/themes";
+import { useQueryClient } from "@tanstack/react-query";
 import { useParams } from "next/navigation";
-import { useContext } from "react";
 
 const DELETE_ITEM_DIALOG_KEY = "delete-item-dialog";
 
 export function DeleteItemDialog({ item }: { item: ItemDto }) {
+	const client = useQueryClient();
 	const { id: box_id } = useParams<{ id: string }>();
-	const { setUpdatedAt } = useContext(BoxContext);
 	async function onConfirmDelete() {
 		if (item.type === "File" && item.archive)
 			await deleteArchive(box_id, item.archive.id);
 		if (item.type === "Folder" && item.folder)
 			await deleteFolder(box_id, item.folder.id);
 
-		setUpdatedAt(new Date());
+		client.invalidateQueries({ queryKey: ["folder-archives"] });
 	}
 	return (
 		<AlertDialog.Root>

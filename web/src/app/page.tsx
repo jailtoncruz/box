@@ -1,6 +1,6 @@
-import { NewBox } from "@/components/intro-buttons/new-box";
+import { NewBox } from "@/app/box/_components/new-box";
 import { Copyright } from "@/components/copyright";
-import { EnterBox } from "@/components/intro-buttons/enter-box";
+import { EnterBox } from "@/app/box/_components/enter-box";
 import { Logo } from "@/components/logo";
 
 export default function Home() {
