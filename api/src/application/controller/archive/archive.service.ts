@@ -38,6 +38,7 @@ export class ArchiveService {
 
   async create(box_id: string, { name, folder_id, type }: CreateArchiveDto) {
     const reference_path = await this.getReferencePathUsecase.execute(
+      box_id,
       folder_id,
       name,
     );
@@ -61,32 +62,19 @@ export class ArchiveService {
       const archive = await this.prisma.archive.delete({
         where: { id },
       });
-      const bucket_id = await this.getBoxBucketId(archive.box_id);
-      await this.bucketService.deleteObject(bucket_id, archive.reference_path);
+      await this.bucketService.deleteObject(archive.reference_path);
     } catch (_err) {
       console.error(_err);
       throw new NotFoundException();
     }
   }
 
-  private async getBoxBucketId(box_id: string) {
-    const box = await this.prisma.box.findUnique({
-      where: { id: box_id },
-      select: { bucket_id: true },
-    });
-    if (!box) throw new NotFoundException();
-    return box.bucket_id;
-  }
-
   private async getPresignedAccessUrl(box_id: string, object: string) {
-    const bucket_id = await this.getBoxBucketId(box_id);
-
     const key = `PRE_SIGNED_ACCESS_URL::${box_id}:${sanitizeText(object)}`;
     const cachedUrl = await this.cacheManager.get<string>(key);
     if (cachedUrl) return cachedUrl;
 
     const url = await this.bucketService.createPresignedGetObject({
-      bucketName: bucket_id,
       object,
       expireAt: this.expireAccessInSeconds,
     });
@@ -97,10 +85,7 @@ export class ArchiveService {
   }
 
   private async getUploadUrl(box_id: string, object: string): Promise<string> {
-    const bucket_id = await this.getBoxBucketId(box_id);
-
     const url = await this.bucketService.createPresignedPutObject({
-      bucketName: bucket_id,
       object,
       expireAt: 60 * 5,
     });

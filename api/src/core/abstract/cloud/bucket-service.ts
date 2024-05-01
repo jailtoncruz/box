@@ -1,13 +1,11 @@
 import { getAbstractThrowMessage } from '../../usecase/abstract/get-abstract-throw-message';
 
 export interface ListObjectOptions {
-  bucketName: string;
   prefix?: string;
   recursive?: boolean;
 }
 
 export interface CreatePreSignedOptions {
-  bucketName: string;
   object: string;
   expireAt?: number;
 }
@@ -17,8 +15,8 @@ export interface IBucketService {
   isBucketExists(name: string): Promise<boolean>;
   deleteBucket(name: string): Promise<void>;
   listObjects(options: ListObjectOptions): Promise<any[]>;
-  deleteObjects(bucketName: string, objects: string[]): Promise<void>;
-  deleteObject(bucketName: string, object: string): Promise<void>;
+  deleteObjects(objects: string[]): Promise<void>;
+  deleteObject(object: string): Promise<void>;
   createPresignedGetObject(options: CreatePreSignedOptions): Promise<string>;
   createPresignedPutObject(options: CreatePreSignedOptions): Promise<string>;
 }
@@ -36,11 +34,11 @@ export abstract class BucketService implements IBucketService {
   listObjects(options: ListObjectOptions): Promise<any[]> {
     throw new Error(getAbstractThrowMessage(options));
   }
-  deleteObjects(bucketName: string, objects: string[]): Promise<void> {
-    throw new Error(getAbstractThrowMessage(bucketName, objects));
+  deleteObjects(objects: string[]): Promise<void> {
+    throw new Error(getAbstractThrowMessage(objects));
   }
-  deleteObject(bucketName: string, object: string): Promise<void> {
-    throw new Error(getAbstractThrowMessage(bucketName, object));
+  deleteObject(object: string): Promise<void> {
+    throw new Error(getAbstractThrowMessage(object));
   }
   createPresignedGetObject(options: CreatePreSignedOptions): Promise<string> {
     throw new Error(getAbstractThrowMessage(options));

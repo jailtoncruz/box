@@ -26,4 +26,19 @@ export class EnvironmentService {
   getOrThrow(name: string): string {
     return this.configService.getOrThrow(name);
   }
+
+  getCloudFlareConfig() {
+    const accountId = this.configService.getOrThrow('CLOUDFLARE_ACCOUNT_ID');
+    const endpoint = `https://${accountId}.r2.cloudflarestorage.com`;
+    const accessKey = this.configService.getOrThrow('CLOUDFLARE_R2_ACCESS_KEY');
+    const secretKey = this.configService.getOrThrow('CLOUDFLARE_R2_SECRET_KEY');
+    const bucket = this.configService.getOrThrow('CLOUDFLARE_R2_BUCKETNAME');
+    return {
+      accountId,
+      endpoint,
+      accessKeyId: accessKey,
+      secretAccessKey: secretKey,
+      bucketName: bucket,
+    };
+  }
 }

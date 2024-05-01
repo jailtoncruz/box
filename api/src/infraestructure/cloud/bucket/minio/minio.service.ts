@@ -9,7 +9,8 @@ import { EnvironmentService } from '../../../config/environment/environment.serv
 
 @Injectable()
 export class MinioService extends BucketService {
-  client: Client;
+  private client: Client;
+  private bucketName: string;
   constructor(private environmentService: EnvironmentService) {
     super();
     this.client = new Client({
@@ -19,6 +20,7 @@ export class MinioService extends BucketService {
       accessKey: this.environmentService.getOrThrow('MINIO_ACCESS_KEY'),
       secretKey: this.environmentService.getOrThrow('MINIO_SECRET_KEY'),
     });
+    this.bucketName = this.environmentService.getOrThrow('MINIO_BUCKETNAME');
   }
 
   async createBucket(name: string): Promise<string> {
@@ -36,38 +38,44 @@ export class MinioService extends BucketService {
     await this.client.removeBucket(name);
   }
 
-  listObjects({
-    bucketName,
-    prefix,
-    recursive,
-  }: ListObjectOptions): Promise<BucketItem[]> {
+  listObjects({ prefix, recursive }: ListObjectOptions): Promise<BucketItem[]> {
     return new Promise<BucketItem[]>((resolve, reject) => {
       const data: BucketItem[] = [];
-      const stream = this.client.listObjectsV2(bucketName, prefix, recursive);
+      const stream = this.client.listObjectsV2(
+        this.bucketName,
+        prefix,
+        recursive,
+      );
       stream.on('data', (obj) => data.push(obj));
       stream.on('error', (err) => reject(err));
       stream.on('end', () => resolve(data));
     });
   }
-  async deleteObjects(bucketName: string, objects: string[]): Promise<void> {
-    await this.client.removeObjects(bucketName, objects);
+  async deleteObjects(objects: string[]): Promise<void> {
+    await this.client.removeObjects(this.bucketName, objects);
   }
-  async deleteObject(bucketName: string, object: string): Promise<void> {
-    await this.client.removeObject(bucketName, object);
+  async deleteObject(object: string): Promise<void> {
+    await this.client.removeObject(this.bucketName, object);
   }
   async createPresignedGetObject({
-    bucketName,
     object,
     expireAt,
   }: CreatePreSignedOptions): Promise<string> {
-    return await this.client.presignedGetObject(bucketName, object, expireAt);
+    return await this.client.presignedGetObject(
+      this.bucketName,
+      object,
+      expireAt,
+    );
   }
 
   async createPresignedPutObject({
-    bucketName,
     object,
     expireAt,
   }: CreatePreSignedOptions): Promise<string> {
-    return await this.client.presignedPutObject(bucketName, object, expireAt);
+    return await this.client.presignedPutObject(
+      this.bucketName,
+      object,
+      expireAt,
+    );
   }
 }

@@ -11,13 +11,18 @@ export class GetReferencePathUsecase {
     @Inject(CACHE_MANAGER) private cacheManager: Cache,
   ) {}
 
-  async execute(folder_id: string, name?: string): Promise<string> {
+  async execute(
+    box_id: string,
+    folder_id: string,
+    name?: string,
+  ): Promise<string> {
     const relations = await this.getFolderRelations(folder_id);
-    return relations
+    const remotePath = relations
       .reverse()
       .map((r) => r.name)
       .join('/')
       .concat(name ? `/${name}` : '');
+    return `${box_id}/${remotePath}`;
   }
 
   private async getFolderRelations(

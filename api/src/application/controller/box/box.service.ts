@@ -6,10 +6,7 @@ import {
 } from '@nestjs/common';
 import { BucketService } from '../../../core/abstract/cloud/bucket-service';
 import { PrismaService } from '../../../infraestructure/database/prisma/prisma.service';
-import {
-  randomBucketId,
-  randomFriendlyId,
-} from '../../../core/usecase/id-generator';
+import { randomFriendlyId } from '../../../core/usecase/id-generator';
 import { CreateBoxDto } from './dto/create-box.dto';
 import { createHash } from '../../../infraestructure/config/hash/create-hash';
 import { checkHash } from '../../../infraestructure/config/hash/check-hash';
@@ -18,7 +15,6 @@ import { checkHash } from '../../../infraestructure/config/hash/check-hash';
 export class BoxService {
   constructor(
     private prisma: PrismaService,
-    private bucket: BucketService,
     private logger: Logger = new Logger(BoxService.name),
   ) {}
 
@@ -41,15 +37,12 @@ export class BoxService {
 
   async create({ name, description, password }: CreateBoxDto) {
     try {
-      const bucket_id = randomBucketId();
-      const bucket = await this.bucket.createBucket(bucket_id);
       const box = await this.prisma.box.create({
         data: {
           id: randomFriendlyId(),
           name,
           description,
           password: password && (await createHash(password)),
-          bucket_id: bucket,
         },
       });
       delete box.password;
@@ -57,7 +50,6 @@ export class BoxService {
     } catch (_err) {
       const err = _err as Error;
       this.logger.error(err.message);
-      this.logger.error(err.stack);
       console.error(err);
       throw new BadRequestException();
     }

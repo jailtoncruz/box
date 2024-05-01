@@ -13,12 +13,12 @@ export class MockBucketService extends BucketService {
   async createPresignedGetObject(
     options: CreatePreSignedOptions,
   ): Promise<string> {
-    return options.bucketName;
+    return options.object;
   }
   async createPresignedPutObject(
     options: CreatePreSignedOptions,
   ): Promise<string> {
-    return options.bucketName;
+    return options.object;
   }
   async deleteBucket(): Promise<void> {}
   async deleteObject(): Promise<void> {}

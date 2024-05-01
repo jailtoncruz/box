@@ -19,7 +19,6 @@ model Box {
   name        String
   description String?
   password    String?
-  bucket_id   String
   folders     Folder[]
 
   @@map("boxes")
